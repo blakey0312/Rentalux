@@ -174,7 +174,7 @@ export default function DataTableCustomer() {
       enableHiding: false,
       cell: ({ row }) => {
         const reservation = row.original
-
+        const isPayed = reservation.payed
         return (
           <Dialog>
 
@@ -182,7 +182,7 @@ export default function DataTableCustomer() {
               <DropdownMenuTrigger asChild>
                 {loading && loadingRowId === row.original.id ? (<Icons.spinner className="h-8 w-8 animate-spin p-0" />)
                   :
-                  <Button variant="ghost" className="h-8 w-8 p-0" disabled={loading}>
+                  <Button variant="ghost" className="h-8 w-8 p-0" disabled={loading || isPayed}>
                     <span className="sr-only">Open menu</span>
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
