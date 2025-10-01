@@ -111,7 +111,7 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
           </DialogHeader>
           <FormField
             control={form.control}
-            name="startData"
+            name="start_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Start Date</FormLabel>
@@ -154,7 +154,7 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
           />
           <FormField
             control={form.control}
-            name="endData"
+            name="end_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>End Date</FormLabel>
