@@ -54,8 +54,8 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      start_date: reservation?.startData ? new Date(reservation.startData) : undefined!,
-      end_date: reservation?.endData ? new Date(reservation.endData) : undefined!,
+      start_date: reservation?.start_date ? new Date(reservation.start_date) : undefined!,
+      end_date: reservation?.end_date ? new Date(reservation.end_date) : undefined!,
     }
   })
 
