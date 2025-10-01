@@ -6,7 +6,7 @@ import LoadingSingle from "../custom components/loadingsingle";
 
 const getData = async (id: string | string[]) => {
   try {
-    const url = `/rental/${id}`;
+    const url = `/api/vehicles/${id}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -17,6 +17,7 @@ const getData = async (id: string | string[]) => {
     return data;
   } catch (error) {
     console.error('there was a problem', error);
+    return null;
   }
 }
 

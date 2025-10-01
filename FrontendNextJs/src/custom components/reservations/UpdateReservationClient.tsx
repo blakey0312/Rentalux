@@ -31,20 +31,20 @@ import { useLoading } from "../LoadingContext"
 interface DatePickerFormProps {
   reservation: {
     id: string;
-    vehicleId: string;
-    customerId: string;
+    vehicle_id: string;
+    customer_id: string;
     payed: boolean;
-    startData: string;
-    endData: string;
+    start_date: string;
+    end_date: string;
   };
   onUpdateSuccess: (updatedReservation: Reservation) => void;
 }
 
 const FormSchema = z.object({
-  startData: z.date({
+  start_date: z.date({
     required_error: "A start date is required.",
   }),
-  endData: z.date({
+  end_date: z.date({
     required_error: "A end date is required.",
   }),
 })
@@ -54,8 +54,8 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      startData: reservation?.startData ? new Date(reservation.startData) : undefined!,
-      endData: reservation?.endData ? new Date(reservation.endData) : undefined!,
+      start_date: reservation?.startData ? new Date(reservation.startData) : undefined!,
+      end_date: reservation?.endData ? new Date(reservation.endData) : undefined!,
     }
   })
 
@@ -71,7 +71,7 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
         "endData": data.endData,
       };
 
-      const url = `/rental/reservation/${reservation.id}`;
+      const url = `/api/reservations/${reservation.id}`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -87,7 +87,7 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
           title: "Reservation has been updated",
 
         })
-        onUpdateSuccess({ ...reservation, ...requestData, startData: requestData.startData.toISOString(), endData: requestData.endData.toISOString() });
+        onUpdateSuccess({ ...reservation, ...requestData, start_date: requestData.startData.toISOString(), end_date: requestData.endData.toISOString() });
       }
     } catch (error) {
       console.error("There was a problem", error)

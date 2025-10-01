@@ -6,9 +6,9 @@ import font from'../custom components/font.module.css'
 
 const getData = async() =>{
     try {
-        const url = '/rental/all'; 
+        const url = '/api/vehicles';
         const response = await fetch(url);
-    
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -17,6 +17,7 @@ const getData = async() =>{
         return data
     }catch(error){
         console.error('there was a problem', error)
+        return []
     }
 }
 export default function vehicles(){
@@ -28,11 +29,12 @@ export default function vehicles(){
       // Fetch data when the component mounts
       getData()
         .then((responseData) => {
-          setVehicles(responseData); // Store the fetched vehicles in state
+          setVehicles(responseData || []); // Store the fetched vehicles in state
           setIsLoading(false); // Set isLoading to false when data is fetched
         })
         .catch((error) => {
           // Handle errors if the fetch fails
+          setVehicles([]);
           setIsLoading(false); // Set isLoading to false on error
         });
     }, []);

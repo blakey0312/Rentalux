@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { sql } from '@/lib/db';
-import { auth } from '@clerk/nextjs/server';
+import { getAuth } from '@clerk/nextjs/server';
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,7 +18,7 @@ export default async function handler(
 
     if (req.method === 'POST') {
       // Create new vehicle (admin only)
-      const { userId } = auth(req);
+      const { userId } = getAuth(req);
 
       if (!userId) {
         return res.status(401).json({ error: 'Unauthorized' });

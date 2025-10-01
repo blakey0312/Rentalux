@@ -31,22 +31,22 @@ import { useLoading } from "../LoadingContext"
 interface DatePickerFormProps {
   reservation: {
     id: string;
-    vehicleId: string;
-    customerId: string;
+    vehicle_id: string;
+    customer_id: string;
     payed: boolean;
-    startData: string;
-    endData: string;
+    start_date: string;
+    end_date: string;
   };
   onUpdateSuccess: (updatedReservation: Reservation) => void;
 }
 
 const FormSchema = z.object({
-  customerId: z.string(),
-  vehicleId: z.string(),
-  startData: z.date({
+  customer_id: z.string(),
+  vehicle_id: z.string(),
+  start_date: z.date({
     required_error: "A start date is required.",
   }),
-  endData: z.date({
+  end_date: z.date({
     required_error: "A end date is required.",
   }),
 })
@@ -57,10 +57,10 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      customerId: reservation?.customerId,
-      vehicleId: reservation?.vehicleId,
-      startData: new Date(reservation?.startData),
-      endData: new Date(reservation?.endData),
+      customer_id: reservation?.customerId,
+      vehicle_id: reservation?.vehicleId,
+      start_date: new Date(reservation?.startData),
+      end_date: new Date(reservation?.endData),
     }
   })
 
@@ -76,7 +76,7 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
         "endData": data.endData,
       };
 
-      const url = `/rental/reservation/${reservation.id}`;
+      const url = `/api/reservations/${reservation.id}`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -91,7 +91,7 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
         toast({
           title: "Reservation has been updated",
         })
-        onUpdateSuccess({ ...reservation, ...requestData, startData: requestData.startData.toISOString(), endData: requestData.endData.toISOString() });
+        onUpdateSuccess({ ...reservation, ...requestData, start_date: requestData.startData.toISOString(), end_date: requestData.endData.toISOString() });
       }
     } catch (error) {
       console.error("There was a problem", error)

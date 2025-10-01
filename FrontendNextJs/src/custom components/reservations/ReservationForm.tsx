@@ -79,14 +79,14 @@ export default function DatePickerForm({ vehicleId, reservations }: DatePickerFo
       try{
       
           const requestData = {
-            startData: data.startData, 
-            endData: data.endData,     
-            vehicleId: vehicleId,
-            customerId: user!.id,
-            paid: false
+            start_date: data.startData,
+            end_date: data.endData,
+            vehicle_id: vehicleId,
+            customer_id: user!.id,
+            payed: false
           };
       
-        const url = '/rental/reservation'; 
+        const url = '/api/reservations'; 
 
         const response = await fetch(url, {
           method: 'POST',

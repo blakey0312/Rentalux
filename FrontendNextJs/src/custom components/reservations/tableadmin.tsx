@@ -44,7 +44,7 @@ import { useProgressLoading } from "../ProgressLoadingContext"
 import { ProgressTable } from "../progresstable"
 
 export async function fetchData(): Promise<Reservation[]> {
-  const url = "/rental/reservation/all";
+  const url = "/api/reservations";
 
   try {
     const response = await fetch(url);
@@ -63,11 +63,11 @@ export async function fetchData(): Promise<Reservation[]> {
 
 export type Reservation = {
   id: string
-  customerId: string
+  customer_id: string
   payed: boolean
-  vehicleId: string
-  startData: string
-  endData: string
+  vehicle_id: string
+  start_date: string
+  end_date: string
 }
 
 
@@ -117,7 +117,7 @@ export default function DataTable() {
       ),
     },
     {
-      accessorKey: "customerId",
+      accessorKey: "customer_id",
       header: ({ column }) => {
         return (
           <Button
@@ -129,10 +129,10 @@ export default function DataTable() {
           </Button>
         )
       },
-      cell: ({ row }) => <div className="">{row.getValue("customerId")}</div>,
+      cell: ({ row }) => <div className="">{row.getValue("customer_id")}</div>,
     },
     {
-      accessorKey: "vehicleId",
+      accessorKey: "vehicle_id",
       header: ({ column }) => {
         return (
           <Button
@@ -144,10 +144,10 @@ export default function DataTable() {
           </Button>
         )
       },
-      cell: ({ row }) => <div className="">{row.getValue("vehicleId")}</div>,
+      cell: ({ row }) => <div className="">{row.getValue("vehicle_id")}</div>,
     },
     {
-      accessorKey: "startData",
+      accessorKey: "start_date",
       header: ({ column }) => {
         return (
           <Button
@@ -159,10 +159,10 @@ export default function DataTable() {
           </Button>
         )
       },
-      cell: ({ row }) => <div className="lowercase">{format(new Date(row.getValue("startData")), 'yyyy-MM-dd')}</div>,
+      cell: ({ row }) => <div className="lowercase">{format(new Date(row.getValue("start_date")), 'yyyy-MM-dd')}</div>,
     },
     {
-      accessorKey: "endData",
+      accessorKey: "end_date",
       header: ({ column }) => {
         return (
           <Button
@@ -174,7 +174,7 @@ export default function DataTable() {
           </Button>
         )
       },
-      cell: ({ row }) => <div className="lowercase">{format(new Date(row.getValue("endData")), 'yyyy-MM-dd')}</div>,
+      cell: ({ row }) => <div className="lowercase">{format(new Date(row.getValue("end_date")), 'yyyy-MM-dd')}</div>,
     },
     {
       id: "actions",
@@ -221,7 +221,7 @@ export default function DataTable() {
   const makeDeleteRequest = async (id: string) => {
     setGlobalLoading(true, id);
 
-    const url = `/rental/reservation/${id}`;
+    const url = `/api/reservations/${id}`;
   
     try {
       const response = await fetch(url, {
