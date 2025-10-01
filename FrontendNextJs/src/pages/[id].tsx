@@ -24,8 +24,8 @@ const getData = async (id: string | string[]) => {
 export default function Vehicle() {
   const router = useRouter();
   const { id } = router.query;
-  const [vehicleData, setVehicleData] 
-  = useState<{ images: any[]; name: string; retailPrice: number; make: number; id: string; reservations: any[] } | null>(null);
+  const [vehicleData, setVehicleData]
+  = useState<{ images: any[]; name: string; retail_price: number; make: string; mileage: number; description: string; id: string; reservations: any[] } | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -53,8 +53,9 @@ export default function Vehicle() {
             />
           </div>
           <h2 className="h-5 w-1/2 font-bold mb-2">{vehicleData.name}</h2>
-          <p className="h-4 w-1/2 font-bold text-sm mb-2">${vehicleData.retailPrice}</p>
-          <p className="h-4 w-1/2 font-bold text-sm">Year: {vehicleData.make}</p>
+          <p className="h-4 w-1/2 font-bold text-sm mb-2">${vehicleData.retail_price?.toLocaleString()}</p>
+          <p className="h-4 w-1/2 font-bold text-sm mb-2">Make: {vehicleData.make}</p>
+          <p className="h-4 w-1/2 font-bold text-sm">{vehicleData.mileage?.toLocaleString()} miles</p>
         </div>
          <div className="self-center px-10">
          <DatePickerForm vehicleId = {vehicleData.id} reservations={vehicleData.reservations}/>
