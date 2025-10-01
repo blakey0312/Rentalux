@@ -28,18 +28,18 @@ import { toast } from "@/components/ui/use-toast"
 import { useState } from "react"
 
 interface DatePickerFormProps {
-    vehicleId: string; 
+    vehicleId: string;
     reservations: Array<{
-        startData: string;
-        endData: string;
+        start_date: string;
+        end_date: string;
       }>;
   }
 
 const FormSchema = z.object({
-  startData: z.date({
+  start_date: z.date({
     required_error: "A start date is required.",
   }),
-  endData: z.date({
+  end_date: z.date({
     required_error: "A end date is required.",
   }),
 })
@@ -67,8 +67,8 @@ export default function DatePickerForm({ vehicleId, reservations }: DatePickerFo
   // Check if reservations is defined, otherwise set an empty array
   const initialDisabledDateRanges = reservations
     ? reservations.map((reservation) => ({
-        start: new Date(reservation.startData),
-        end: new Date(reservation.endData),
+        start: new Date(reservation.start_date),
+        end: new Date(reservation.end_date),
       }))
     : [];
 
@@ -77,43 +77,55 @@ export default function DatePickerForm({ vehicleId, reservations }: DatePickerFo
     async function onSubmit(data: z.infer<typeof FormSchema>) {
       setLoading(true);
       try{
-      
+
           const requestData = {
-            start_date: data.startData,
-            end_date: data.endData,
+            start_date: data.start_date,
+            end_date: data.end_date,
             vehicle_id: vehicleId,
             customer_id: user!.id,
             payed: false
           };
-      
-        const url = '/api/reservations'; 
+
+        const url = '/api/reservations';
 
         const response = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(requestData), 
+          body: JSON.stringify(requestData),
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }else{
-          const newReservation = {
-            start: new Date(data.startData),
-            end: new Date(data.endData),
-          };
-          setDisabledDateRanges([...disabledDateRanges, newReservation]);
+          const errorData = await response.json();
           setLoading(false);
-            toast({
-            title: "Dates have been reserved",
-          })
+          toast({
+            title: "Reservation Failed",
+            description: errorData.error || "Vehicle is not available for selected dates",
+            variant: "destructive"
+          });
+          return;
         }
+
+        const newReservation = {
+          start: new Date(data.start_date),
+          end: new Date(data.end_date),
+        };
+        setDisabledDateRanges([...disabledDateRanges, newReservation]);
+        setLoading(false);
+        toast({
+          title: "Dates have been reserved",
+        });
+        form.reset();
      }catch(error){
-        console.error("There was a problem", error)
+        console.error("There was a problem", error);
+        setLoading(false);
+        toast({
+          title: "Error",
+          description: "There was a problem with your reservation",
+          variant: "destructive"
+        });
      }
-     
-    form.reset();
   }
 
   return (
@@ -121,7 +133,7 @@ export default function DatePickerForm({ vehicleId, reservations }: DatePickerFo
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="startData"
+          name="start_date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Start Date</FormLabel>
@@ -165,7 +177,7 @@ export default function DatePickerForm({ vehicleId, reservations }: DatePickerFo
         />
         <FormField
           control={form.control}
-          name="endData"
+          name="end_date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>End Date</FormLabel>
