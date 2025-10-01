@@ -57,10 +57,10 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      customer_id: reservation?.customerId,
-      vehicle_id: reservation?.vehicleId,
-      start_date: new Date(reservation?.startData),
-      end_date: new Date(reservation?.endData),
+      customer_id: reservation?.customer_id,
+      vehicle_id: reservation?.vehicle_id,
+      start_date: new Date(reservation?.start_date),
+      end_date: new Date(reservation?.end_date),
     }
   })
 
@@ -69,11 +69,11 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
     setGlobalLoading(true, reservation.id)
     try {
       const requestData = {
-        "customerId": data.customerId,
+        "customer_id": data.customer_id,
         "payed": false,
-        "vehicleId": data.vehicleId,
-        "startData": data.startData,
-        "endData": data.endData,
+        "vehicle_id": data.vehicle_id,
+        "start_date": data.start_date,
+        "end_date": data.end_date,
       };
 
       const url = `/api/reservations/${reservation.id}`;
@@ -91,7 +91,7 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
         toast({
           title: "Reservation has been updated",
         })
-        onUpdateSuccess({ ...reservation, ...requestData, start_date: requestData.startData.toISOString(), end_date: requestData.endData.toISOString() });
+        onUpdateSuccess({ ...reservation, ...requestData, start_date: requestData.start_date.toISOString(), end_date: requestData.end_date.toISOString() });
       }
     } catch (error) {
       console.error("There was a problem", error)
@@ -114,7 +114,7 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
           </DialogHeader>
           <FormField
             control={form.control}
-            name="customerId"
+            name="customer_id"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Customer Id</FormLabel>
@@ -127,7 +127,7 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
           />
           <FormField
             control={form.control}
-            name="vehicleId"
+            name="vehicle_id"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Vehicle Id</FormLabel>
@@ -140,7 +140,7 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
           />
           <FormField
             control={form.control}
-            name="startData"
+            name="start_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Start Date</FormLabel>
@@ -183,7 +183,7 @@ export default function DatePickerFormUpdate({ reservation, onUpdateSuccess}: Da
           />
           <FormField
             control={form.control}
-            name="endData"
+            name="end_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>End Date</FormLabel>

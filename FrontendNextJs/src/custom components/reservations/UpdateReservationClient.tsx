@@ -64,11 +64,11 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
     setGlobalLoading(true, reservation.id)
     try {
       const requestData = {
-        "customerId": reservation.customerId,
+        "customer_id": reservation.customer_id,
         "payed": false,
-        "vehicleId": reservation.vehicleId,
-        "startData": data.startData,
-        "endData": data.endData,
+        "vehicle_id": reservation.vehicle_id,
+        "start_date": data.start_date,
+        "end_date": data.end_date,
       };
 
       const url = `/api/reservations/${reservation.id}`;
@@ -87,7 +87,7 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
           title: "Reservation has been updated",
 
         })
-        onUpdateSuccess({ ...reservation, ...requestData, start_date: requestData.startData.toISOString(), end_date: requestData.endData.toISOString() });
+        onUpdateSuccess({ ...reservation, ...requestData, start_date: requestData.start_date.toISOString(), end_date: requestData.end_date.toISOString() });
       }
     } catch (error) {
       console.error("There was a problem", error)
