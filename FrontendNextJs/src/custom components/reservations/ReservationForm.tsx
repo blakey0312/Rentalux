@@ -25,7 +25,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { toast } from "@/components/ui/use-toast"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 
 interface DatePickerFormProps {
     vehicleId: string;
@@ -73,6 +73,31 @@ export default function DatePickerForm({ vehicleId, reservations }: DatePickerFo
     : [];
 
   const [disabledDateRanges, setDisabledDateRanges] = useState(initialDisabledDateRanges);
+
+  // Calculate the next available date to set as default month
+  const defaultMonth = useMemo(() => {
+    if (disabledDateRanges.length === 0) {
+      return new Date(); // No reservations, use current month
+    }
+
+    // Sort reservations by end date
+    const sortedRanges = [...disabledDateRanges].sort((a, b) => b.end.getTime() - a.end.getTime());
+
+    // Find the latest end date
+    const latestEndDate = sortedRanges[0].end;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // If the latest reservation ends in the future, show that month (next day after end)
+    if (latestEndDate > today) {
+      const nextAvailable = new Date(latestEndDate);
+      nextAvailable.setDate(nextAvailable.getDate() + 1);
+      return nextAvailable;
+    }
+
+    // Otherwise, show current month
+    return today;
+  }, [disabledDateRanges]);
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
       setLoading(true);
@@ -164,6 +189,7 @@ export default function DatePickerForm({ vehicleId, reservations }: DatePickerFo
                     disabled={(date) =>
                         date < new Date() || isDateRangeOverlapping(date, disabledDateRanges)
                     }
+                    defaultMonth={defaultMonth}
                     initialFocus
                   />
                 </PopoverContent>
@@ -208,6 +234,7 @@ export default function DatePickerForm({ vehicleId, reservations }: DatePickerFo
                     disabled={(date) =>
                         date < new Date() || isDateRangeOverlapping(date, disabledDateRanges)
                     }
+                    defaultMonth={defaultMonth}
                     initialFocus
                   />
                 </PopoverContent>
