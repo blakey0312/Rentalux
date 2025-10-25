@@ -54,9 +54,11 @@ export default function Vehicle() {
           </div>
           <div className="p-4 md:p-6 lg:p-8">
             <h2 className="font-bold text-xl md:text-2xl mb-3">{vehicleData.name}</h2>
-            <p className="font-bold text-base md:text-lg mb-2">${vehicleData.retail_price?.toLocaleString()}</p>
+            <p className="font-bold text-base md:text-lg mb-2">
+              {Number(vehicleData.retail_price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+            </p>
             <p className="font-bold text-sm md:text-base mb-2">Make: {vehicleData.make}</p>
-            <p className="font-bold text-sm md:text-base">{vehicleData.mileage?.toLocaleString()} miles</p>
+            <p className="font-bold text-sm md:text-base">{Number(vehicleData.mileage).toLocaleString()} miles</p>
           </div>
         </div>
          <div className="flex items-center justify-center p-4 md:p-6 lg:p-8">

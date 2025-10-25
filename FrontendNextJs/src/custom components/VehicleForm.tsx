@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/components/ui/use-toast"
+import { API_ENDPOINTS } from "@/lib/api-config"
 
 
 const formSchema = z.object({
@@ -41,22 +42,36 @@ export default function VehicleForm() {
 
   
  async function onSubmit(values: z.infer<typeof formSchema>) {
-  
+
     try {
       const imagesArray = values.images.split(',').map((url) => url.trim());
-      const updatedValues = { ...values, images: imagesArray };
-      const url = '/rental'; 
-      const response = await fetch(url, {
+
+      // Clean numeric values (remove commas and convert to numbers)
+      const cleanedRetailPrice = parseFloat(values.retailPrice.replace(/,/g, ''));
+      const cleanedMileage = parseFloat(values.mileage.replace(/,/g, ''));
+
+      // Transform camelCase to snake_case for API
+      const payload = {
+        name: values.name,
+        description: values.description,
+        retail_price: cleanedRetailPrice,
+        mileage: cleanedMileage,
+        vehicle_type: values.vehicleType,
+        make: values.make,
+        images: imagesArray
+      };
+
+      const response = await fetch(API_ENDPOINTS.vehicles.create(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedValues), 
+        body: JSON.stringify(payload),
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
-      }else{
+      } else {
         toast({
           title: "Rental has been created",
           description: values.name
