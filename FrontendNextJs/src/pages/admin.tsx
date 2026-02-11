@@ -1,34 +1,37 @@
 import { useEffect, useState } from "react";
 import  TabsAdmin from "../custom components/AdminSwitch";
 import  Menu  from "../custom components/Menu";
-import { useOrganizationList, useUser} from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { useRouter } from "next/router";
+
 export default function Admin() {
-  const { organizationList, isLoaded } = useOrganizationList();
-  const { isSignedIn } = useUser();
+  const { user, isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
-      if (isLoaded && isSignedIn) {
-        // Find the admin organization from the loaded organization list
-        const adminOrganization = organizationList.find(
-          (org) => org.membership.role === "admin"
-        );
+      if (isLoaded) {
+        if (!isSignedIn) {
+          // Redirect to sign-in if not signed in
+          router.push("/sign-in");
+          return;
+        }
 
-        // If the user is not an admin, redirect to the homepage
-        if (!adminOrganization || adminOrganization.membership.role !== "admin") {
-          router.push("/"); // Replace '/' with the homepage URL
-        } else {
-          // Set the state to indicate admin status
+        // Check if user has admin role in public metadata
+        const userRole = user?.publicMetadata?.role as string | undefined;
+
+        if (userRole === "admin") {
           setIsAdmin(true);
+        } else {
+          // Not an admin, redirect to home
+          router.push("/");
         }
       }
     };
 
     checkAdminStatus();
-  }, [isLoaded, organizationList, isSignedIn, router]);
+  }, [isLoaded, isSignedIn, user, router]);
 
   return (
     <>

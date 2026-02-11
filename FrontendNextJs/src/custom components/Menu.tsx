@@ -18,6 +18,8 @@ import Logo from "./logo"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
 import checkUserRole  from '../pages/utils/userUtils';
+import { Menu as MenuIcon, X } from "lucide-react"
+import { useState } from "react"
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -37,11 +39,14 @@ const components: { title: string; href: string; description: string }[] = [
 
 export default function Menu() {
   const { session } = useSession();
- 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const userRole = checkUserRole(session);
 
   return (
-    <div className="flex items-center">
+    <>
+    {/* Desktop Navigation */}
+    <div className="hidden min-[560px]:flex items-center w-full">
     <ul className="flex items-center px-1">
     <Logo/>
     </ul>
@@ -56,7 +61,7 @@ export default function Menu() {
                 <NavigationMenuLink asChild>
                   <a
                     className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    
+
                   >
                     {/* //<Icons.logo className="h-6 w-6" /> */}
                     <div className="mb-2 mt-4 text-lg font-medium">
@@ -97,7 +102,7 @@ export default function Menu() {
           </NavigationMenuContent>
         </NavigationMenuItem>
         <SignedIn>
-        {userRole === 'admin' && 
+        {userRole === 'admin' &&
         (
         <NavigationMenuItem>
           <Link href="/admin" legacyBehavior passHref>
@@ -132,6 +137,75 @@ export default function Menu() {
     </ul>
     </SignedIn>
   </div>
+
+  {/* Mobile Navigation */}
+  <div className="flex min-[560px]:hidden items-center justify-between w-full">
+    <Logo/>
+    <div className="flex items-center gap-2">
+      <ModeToggle/>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="h-9 w-9"
+      >
+        {mobileMenuOpen ? <X className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+      </Button>
+    </div>
+  </div>
+
+  {/* Mobile Menu Dropdown */}
+  {mobileMenuOpen && (
+    <div className="min-[560px]:hidden absolute top-[72px] left-0 right-0 bg-background border-b shadow-lg z-50">
+      <nav className="flex flex-col p-4 space-y-4">
+        <div className="flex flex-col space-y-2">
+          <h3 className="font-semibold text-sm text-muted-foreground px-2">About</h3>
+          <Link href="/" className="px-2 py-2 hover:bg-accent rounded-md" onClick={() => setMobileMenuOpen(false)}>
+            Introduction
+          </Link>
+        </div>
+
+        <div className="flex flex-col space-y-2">
+          <h3 className="font-semibold text-sm text-muted-foreground px-2">Browse</h3>
+          {components.map((component) => (
+            <Link
+              key={component.title}
+              href={component.href}
+              className="px-2 py-2 hover:bg-accent rounded-md"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <div className="font-medium">{component.title}</div>
+              <div className="text-sm text-muted-foreground">{component.description}</div>
+            </Link>
+          ))}
+        </div>
+
+        <SignedIn>
+          {userRole === 'admin' && (
+            <Link href="/admin" className="px-2 py-2 hover:bg-accent rounded-md font-medium" onClick={() => setMobileMenuOpen(false)}>
+              Admin
+            </Link>
+          )}
+        </SignedIn>
+
+        <div className="pt-4 border-t">
+          <SignedOut>
+            <Button className="w-full" asChild>
+              <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
+            </Button>
+          </SignedOut>
+          <SignedIn>
+            <SignOutButton>
+              <Button className="w-full" onClick={() => { signout(); setMobileMenuOpen(false); }}>
+                Sign out
+              </Button>
+            </SignOutButton>
+          </SignedIn>
+        </div>
+      </nav>
+    </div>
+  )}
+  </>
   )
 }
 

@@ -1,37 +1,24 @@
-import { Reservation } from '@/custom components/reservations/tablecustomer';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { buffer } from 'stream/consumers';
 import Stripe from 'stripe';
+import { sql } from '@/lib/db';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-08-16',
 });
 
-const handleSuccessfulPayment = async (reservation : Reservation) => {
+const handleSuccessfulPayment = async (reservation: any, sessionId: string) => {
   try {
-    const requestData = {
-      "customerId": reservation.customerId,
-      "payed": true,
-      "vehicleId": reservation.vehicleId,
-      "startData": reservation.startData,
-      "endData": reservation.endData,
-    };
+    // Update reservation in Neon database
+    await sql(
+      'UPDATE reservations SET payed = $1, stripe_session_id = $2 WHERE id = $3',
+      [true, sessionId, reservation.id]
+    );
 
-    const url = `http://rentalux-env.eba-tq5h4ncr.us-east-1.elasticbeanstalk.com/rental/reservation/${reservation.id}`;
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestData),
-    });
-
-    if (!response.ok) {
-      console.error('Failed to update reservation:', response.statusText);
-    }
+    console.log(`Reservation ${reservation.id} marked as paid`);
   } catch (error) {
-    console.error('Error updating reservation:' , error);
-    // Handle error as needed
+    console.error('Error updating reservation:', error);
+    throw error;
   }
 };
 
@@ -45,7 +32,6 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const body = await buffer(req);
   const signature = req.headers['stripe-signature']!;
 
-
   let event: Stripe.Event
 
   try {
@@ -54,23 +40,30 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     )
-
-    
-  } catch (err : any) {
+  } catch (err: any) {
     res.status(400).send(`Webhook Error: ${err.message}`)
     return
   }
-  
-  if (event.type === "checkout.session.completed") {
-    // Retrieve the subscription details from Stripe.
-    const reservationString = (event.data.object as { metadata?: { reservation?: string } })?.metadata?.reservation;
-    const reservation = JSON.parse(reservationString!);
 
-   await handleSuccessfulPayment(reservation);
-   res.status(200).json({ message: `${reservation.id}` })
+  if (event.type === "checkout.session.completed") {
+    // Retrieve the reservation details from Stripe metadata
+    const session = event.data.object as Stripe.Checkout.Session;
+    const reservationString = session.metadata?.reservation;
+
+    if (!reservationString) {
+      console.error('No reservation data in Stripe session metadata');
+      res.status(400).json({ error: 'No reservation data' });
+      return;
+    }
+
+    const reservation = JSON.parse(reservationString);
+
+    await handleSuccessfulPayment(reservation, session.id);
+    res.status(200).json({ message: `Reservation ${reservation.id} processed` })
   }
-  else{
-    res.status(200).json({ message: `${event.type}` })
+  else {
+    res.status(200).json({ message: `Event type ${event.type} received` })
   }
 }
+
 export default webhookHandler;

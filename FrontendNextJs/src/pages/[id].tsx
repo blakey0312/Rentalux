@@ -6,7 +6,7 @@ import LoadingSingle from "../custom components/loadingsingle";
 
 const getData = async (id: string | string[]) => {
   try {
-    const url = `/rental/${id}`;
+    const url = `/api/vehicles/${id}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -17,14 +17,15 @@ const getData = async (id: string | string[]) => {
     return data;
   } catch (error) {
     console.error('there was a problem', error);
+    return null;
   }
 }
 
 export default function Vehicle() {
   const router = useRouter();
   const { id } = router.query;
-  const [vehicleData, setVehicleData] 
-  = useState<{ images: any[]; name: string; retailPrice: number; make: number; id: string; reservations: any[] } | null>(null);
+  const [vehicleData, setVehicleData]
+  = useState<{ images: any[]; name: string; retail_price: number; make: string; mileage: number; description: string; id: string; reservations: any[] } | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -39,23 +40,28 @@ export default function Vehicle() {
           <nav className="p-6 space-x-6 ">
             <Menu/>
           </nav>
-    <main className="m-24 flex justify-center">
-      <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 custom-xs:grid-cols-1 gap-6">
-      {vehicleData ? 
+    <main className="mx-4 sm:mx-8 md:mx-12 lg:mx-24 my-8 md:my-24 flex justify-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 w-full max-w-6xl">
+      {vehicleData ?
       <>
-        <div className="p-8 bg-gray-50 hover:shadow-md hover:shadow-emerald-700">
-          <div>
+        <div className="bg-gray-50 hover:shadow-md hover:shadow-emerald-700 transition-shadow overflow-hidden">
+          <div className="w-full aspect-[4/3] overflow-hidden">
             <img
               src={vehicleData.images.at(0)}
               alt={vehicleData.name}
-              className="rounded-mb w-96 h-80 object-cover"
+              className="w-full h-full object-cover"
             />
           </div>
-          <h2 className="h-5 w-1/2 font-bold mb-2">{vehicleData.name}</h2>
-          <p className="h-4 w-1/2 font-bold text-sm mb-2">${vehicleData.retailPrice}</p>
-          <p className="h-4 w-1/2 font-bold text-sm">Year: {vehicleData.make}</p>
+          <div className="p-4 md:p-6 lg:p-8">
+            <h2 className="font-bold text-xl md:text-2xl mb-3">{vehicleData.name}</h2>
+            <p className="font-bold text-base md:text-lg mb-2">
+              {Number(vehicleData.retail_price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+            </p>
+            <p className="font-bold text-sm md:text-base mb-2">Make: {vehicleData.make}</p>
+            <p className="font-bold text-sm md:text-base">{Number(vehicleData.mileage).toLocaleString()} miles</p>
+          </div>
         </div>
-         <div className="self-center px-10">
+         <div className="flex items-center justify-center p-4 md:p-6 lg:p-8">
          <DatePickerForm vehicleId = {vehicleData.id} reservations={vehicleData.reservations}/>
         </div>
         </>

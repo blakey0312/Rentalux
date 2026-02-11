@@ -6,9 +6,9 @@ import font from'../custom components/font.module.css'
 
 const getData = async() =>{
     try {
-        const url = '/rental/all'; 
+        const url = '/api/vehicles';
         const response = await fetch(url);
-    
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -17,6 +17,7 @@ const getData = async() =>{
         return data
     }catch(error){
         console.error('there was a problem', error)
+        return []
     }
 }
 export default function vehicles(){
@@ -28,11 +29,12 @@ export default function vehicles(){
       // Fetch data when the component mounts
       getData()
         .then((responseData) => {
-          setVehicles(responseData); // Store the fetched vehicles in state
+          setVehicles(responseData || []); // Store the fetched vehicles in state
           setIsLoading(false); // Set isLoading to false when data is fetched
         })
         .catch((error) => {
           // Handle errors if the fetch fails
+          setVehicles([]);
           setIsLoading(false); // Set isLoading to false on error
         });
     }, []);
@@ -45,18 +47,20 @@ export default function vehicles(){
           {isLoading ? (
         <Loading />
       ) : (
-        <main className="m-24 flex justify-center">
-        <div className="grid grid-cols-3 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 custom-xs:grid-cols-1 gap-12">
+        <main className="mx-4 sm:mx-8 md:mx-12 lg:mx-24 my-8 md:my-24 flex justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 lg:gap-12 w-full max-w-7xl">
         {vehicles.map((vehicle) => (
           <Link href={`/${vehicle.id}`} key={vehicle.id}>
-            <div className="p-8 bg-gray-50 hover:shadow-md hover:shadow-emerald-700">
-              <div>
-                <img src={vehicle.images.at(0)} alt={vehicle.name} className="rounded-mb w-96 h-80 object-cover " />
+            <div className="bg-gray-50 hover:shadow-md hover:shadow-emerald-700 transition-shadow overflow-hidden h-full flex flex-col">
+              <div className="w-full aspect-[4/3] overflow-hidden">
+                <img src={vehicle.images.at(0)} alt={vehicle.name} className="w-full h-full object-cover" />
               </div>
-              <h2 className={`h-5 w-1/2 font-bold text-xl ${font['custom-font-element']} mb-2`}>
-              {vehicle.name}
-              </h2>              
-            <p className="h-4 w-1/2 font-bold font-serif text-muted-foreground text-xs mb-4">{vehicle.description}</p>
+              <div className="p-4 md:p-6 lg:p-8 flex-1">
+                <h2 className={`font-bold text-lg md:text-xl ${font['custom-font-element']} mb-2 line-clamp-1`}>
+                  {vehicle.name}
+                </h2>
+                <p className="font-bold font-serif text-muted-foreground text-xs md:text-sm line-clamp-2">{vehicle.description}</p>
+              </div>
             </div>
         </Link>
       ))}

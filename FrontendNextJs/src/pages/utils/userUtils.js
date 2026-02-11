@@ -1,24 +1,16 @@
-
 function checkUserRole(session) {
-    if (
-      !session ||
-      !session.user ||
-      !session.user.organizationMemberships ||
-      session.user.organizationMemberships.length === 0
-    ) {
-      return null; // Return null if the user is not a basic member
-    }
-  
-    const organizationMemberships = session.user.organizationMemberships;
-  
-    // Loop through all organization memberships
-    for (const membership of organizationMemberships) {
-      if (membership.role) {
-        return membership.role.toLowerCase(); // Return the role in lowercase if it exists
-      }
-    }
-  
-    return null; // Return null if no role is found in the memberships
+  if (!session || !session.user) {
+    return null; // Return null if the user is not signed in
   }
-  
-  export default checkUserRole ;
+
+  // Check for role in public metadata (Clerk v5 approach)
+  const userRole = session.user.publicMetadata?.role;
+
+  if (userRole) {
+    return userRole.toLowerCase(); // Return the role in lowercase
+  }
+
+  return null; // Return null if no role is found
+}
+
+export default checkUserRole;

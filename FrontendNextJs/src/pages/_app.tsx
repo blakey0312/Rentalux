@@ -9,7 +9,7 @@ import {LoadingProvider} from '../custom components/LoadingContext';
 import {ProgressLoadingProvider} from '../custom components/ProgressLoadingContext';
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div >
+    <div className="min-w-0 w-full">
       <Head>
         <title>Rentalux</title>
       </Head>

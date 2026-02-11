@@ -31,20 +31,20 @@ import { useLoading } from "../LoadingContext"
 interface DatePickerFormProps {
   reservation: {
     id: string;
-    vehicleId: string;
-    customerId: string;
+    vehicle_id: string;
+    customer_id: string;
     payed: boolean;
-    startData: string;
-    endData: string;
+    start_date: string;
+    end_date: string;
   };
   onUpdateSuccess: (updatedReservation: Reservation) => void;
 }
 
 const FormSchema = z.object({
-  startData: z.date({
+  start_date: z.date({
     required_error: "A start date is required.",
   }),
-  endData: z.date({
+  end_date: z.date({
     required_error: "A end date is required.",
   }),
 })
@@ -54,8 +54,8 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      startData: reservation?.startData ? new Date(reservation.startData) : undefined!,
-      endData: reservation?.endData ? new Date(reservation.endData) : undefined!,
+      start_date: reservation?.start_date ? new Date(reservation.start_date) : undefined!,
+      end_date: reservation?.end_date ? new Date(reservation.end_date) : undefined!,
     }
   })
 
@@ -64,14 +64,14 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
     setGlobalLoading(true, reservation.id)
     try {
       const requestData = {
-        "customerId": reservation.customerId,
+        "customer_id": reservation.customer_id,
         "payed": false,
-        "vehicleId": reservation.vehicleId,
-        "startData": data.startData,
-        "endData": data.endData,
+        "vehicle_id": reservation.vehicle_id,
+        "start_date": data.start_date,
+        "end_date": data.end_date,
       };
 
-      const url = `/rental/reservation/${reservation.id}`;
+      const url = `/api/reservations/${reservation.id}`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -87,7 +87,7 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
           title: "Reservation has been updated",
 
         })
-        onUpdateSuccess({ ...reservation, ...requestData, startData: requestData.startData.toISOString(), endData: requestData.endData.toISOString() });
+        onUpdateSuccess({ ...reservation, ...requestData, start_date: requestData.start_date.toISOString(), end_date: requestData.end_date.toISOString() });
       }
     } catch (error) {
       console.error("There was a problem", error)
@@ -111,7 +111,7 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
           </DialogHeader>
           <FormField
             control={form.control}
-            name="startData"
+            name="start_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Start Date</FormLabel>
@@ -154,7 +154,7 @@ export default function DatePickerFormUpdateClient({ reservation, onUpdateSucces
           />
           <FormField
             control={form.control}
-            name="endData"
+            name="end_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>End Date</FormLabel>
